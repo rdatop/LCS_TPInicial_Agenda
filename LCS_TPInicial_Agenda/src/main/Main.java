@@ -1,7 +1,7 @@
 package main;
 
 import modelo.Agenda;
-import persistencia.conexion.Conexion;//consultal por este problema
+import persistencia.conexion.Conexion;//consultal por este problemita
 import persistencia.dao.mysql.DAOSQLFactory;
 import presentacion.controlador.Controlador;
 import presentacion.vista.Vista;
