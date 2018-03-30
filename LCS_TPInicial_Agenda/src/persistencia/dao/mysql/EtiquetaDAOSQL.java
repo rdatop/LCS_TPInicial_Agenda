@@ -11,7 +11,6 @@ import persistencia.conexion.Conexion;
 import persistencia.dao.interfaz.EtiquetaDAO;
 
 public class EtiquetaDAOSQL implements EtiquetaDAO {
-
 	private static final String insert = "INSERT INTO etiqueta(idEtiqueta, etiqueta) VALUES(?, ?)";
 	private static final String delete = "DELETE FROM etiqueta WHERE idEtiqueta = ?";
 	private static final String readall = "SELECT * FROM etiqueta ORDER BY etiqueta";
@@ -25,7 +24,7 @@ public class EtiquetaDAOSQL implements EtiquetaDAO {
 		try {
 			statement = conexion.getSQLConexion().prepareStatement(insert);
 			statement.setInt(1, etiqueta.getIdEtiqueta());
-			statement.setString(2, etiqueta.getEtiqueta());
+			statement.setString(2, etiqueta.getEtiqueta().toUpperCase());
 			if (statement.executeUpdate() > 0) // Si se ejecutï¿½ devuelvo true
 				return true;
 		} catch (SQLException e) {
@@ -45,7 +44,7 @@ public class EtiquetaDAOSQL implements EtiquetaDAO {
 			if (chequeoUpdate > 0) // Si se ejecutÃ³ devuelvo true
 				return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("La etiqueta está en uso, no se puede borrar");
 		}
 		return false;
 	}
@@ -73,7 +72,7 @@ public class EtiquetaDAOSQL implements EtiquetaDAO {
 		Conexion conexion = Conexion.getConexion();
 		try {
 			statement = conexion.getSQLConexion().prepareStatement(edit);
-			statement.setString(1, nueva_etiqueta);
+			statement.setString(1, nueva_etiqueta.toUpperCase());
 			statement.setInt(2, etiqueta_a_editar.getIdEtiqueta());
 			if (statement.executeUpdate() > 0) // Si se ejecutï¿½ devuelvo true
 				return true;
@@ -122,4 +121,5 @@ public class EtiquetaDAOSQL implements EtiquetaDAO {
 		}
 		return etiqueta;
 	}
+
 }

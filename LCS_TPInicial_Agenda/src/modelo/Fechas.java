@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+//@author  Henry Joe Wong Urquiza
 public class Fechas {
 
 	private static SimpleDateFormat formatoDeFecha = new SimpleDateFormat("yyyy-MM-dd");
@@ -101,4 +102,5 @@ public class Fechas {
 	public static synchronized String deDateToString(Date fecha) {
 		return formatoDeFecha.format(fecha);
 	}
+
 }

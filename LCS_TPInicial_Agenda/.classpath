@@ -8,6 +8,8 @@
 	<classpathentry kind="lib" path="lib/jasperreports-6.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-beanutils-1.9.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/P3_Calendario_bizcal/lib/jcalendar-1.3.2.jar"/>
+	<classpathentry kind="src" path="/Agenda"/>
+	<classpathentry kind="lib" path="D:/IDEs y Herramientas Programacion/jcalendar-1.4.jar/jcalendar-1.4.jar"/>
+	<classpathentry kind="lib" path="D:/workspace - neon3 - 32orig/Agenda/lib/jfreechart-1.0.19.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

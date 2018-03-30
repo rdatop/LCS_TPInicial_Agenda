@@ -1,7 +1,6 @@
 package dto;
 
 public class EtiquetaDTO {
-
 	private int idEtiqueta;
 	private String etiqueta;
 
@@ -25,4 +24,6 @@ public class EtiquetaDTO {
 	public void setEtiqueta(String etiqueta) {
 		this.etiqueta = etiqueta;
 	}
+
+
 }

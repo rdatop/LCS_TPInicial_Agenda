@@ -18,8 +18,5 @@ public interface DomicilioDAO {
 
 	public DomicilioDTO readDomicilioDTO(int idDomicilio);
 
-	public boolean edit(String nuevaCalle, String nuevaAltura, 
-		String nuevoPiso, String nuevoDepartamento, int nuevoIdLocalidad, 
-		int idDomicilio_a_modificar);
-
+	public boolean edit(String nuevaCalle, String nuevaAltura, String nuevoPiso, String nuevoDepartamento, int nuevoIdLocalidad, int idDomicilio_a_modificar);
 }

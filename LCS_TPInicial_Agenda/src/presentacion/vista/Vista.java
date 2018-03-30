@@ -3,13 +3,15 @@ package presentacion.vista;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.UIManager;
+import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 
 import persistencia.conexion.Conexion;
@@ -24,19 +26,14 @@ public class Vista {
 	private JButton btnEtiqueta;
 	private JButton btnLocalidad;
 	private JButton btnEditar;
+//	private JLabel fondo;
 
 	private DefaultTableModel modelPersonas;
-	private String[] nombreColumnas = { "Nombre y apellido", "Telefono", "eMail", "Fecha Cumpleanos", "Domicilio",
+	private String[] nombreColumnas = { "Nombre", "Apellido", "Tel�fono", "eMail", "Fecha Cumplea�os", "Domicilio",
 			"Etiqueta" };
 
 	public Vista() {
 		super();
-		//estilizacion de la vista hay que verlo para la proxima
-		/*try{
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-		}catch(Exception e){
-			e.printStackTrace();
-		}*/
 		initialize();
 	}
 
@@ -57,6 +54,11 @@ public class Vista {
 		spPersonas.setBounds(10, 11, 685, 352);
 		panel.add(spPersonas);
 
+//		fondo = new JLabel("");
+//		fondo.setHorizontalAlignment(SwingConstants.CENTER);
+//		fondo.setIcon(new ImageIcon(Vista.class.getResource("/presentacion/vista/agenda.jpg")));//presentacion.vista.
+//		fondo.setBounds(10, 40, 685, 323);
+//		panel.add(fondo);
 		modelPersonas = new DefaultTableModel(null, nombreColumnas);
 		tablaPersonas = new JTable(modelPersonas);
 
@@ -98,6 +100,8 @@ public class Vista {
 		btnLocalidad = new JButton("Localidad");
 		btnLocalidad.setBounds(589, 374, 89, 23);
 		panel.add(btnLocalidad);
+		
+		
 	}
 
 	public void show() {
@@ -151,4 +155,7 @@ public class Vista {
 	public JButton getBtnLocalidad() {
 		return btnLocalidad;
 	}
+	
+	
 }
+

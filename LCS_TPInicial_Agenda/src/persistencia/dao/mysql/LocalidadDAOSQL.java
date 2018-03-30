@@ -11,7 +11,6 @@ import persistencia.conexion.Conexion;
 import persistencia.dao.interfaz.LocalidadDAO;
 
 public class LocalidadDAOSQL implements LocalidadDAO {
-
 	private static final String insert = "INSERT INTO localidad (idLocalidad, localidad) VALUES(?, ?)";
 	private static final String delete = "DELETE FROM localidad WHERE idLocalidad = ?";
 	private static final String readall = "SELECT * FROM localidad ORDER BY localidad";
@@ -25,7 +24,7 @@ public class LocalidadDAOSQL implements LocalidadDAO {
 		try {
 			statement = conexion.getSQLConexion().prepareStatement(insert);
 			statement.setInt(1, localidad.getIdLocalidad());
-			statement.setString(2, localidad.getLocalidad());
+			statement.setString(2, localidad.getLocalidad().toUpperCase());
 			if (statement.executeUpdate() > 0) // Si se ejecutï¿½ devuelvo true
 				return true;
 		} catch (SQLException e) {
@@ -45,7 +44,7 @@ public class LocalidadDAOSQL implements LocalidadDAO {
 			if (chequeoUpdate > 0) // Si se ejecutÃ³ devuelvo true
 				return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println("La localidad está en uso, no se puede borrar");
 		}
 		return false;
 	}
@@ -73,7 +72,7 @@ public class LocalidadDAOSQL implements LocalidadDAO {
 		Conexion conexion = Conexion.getConexion();
 		try {
 			statement = conexion.getSQLConexion().prepareStatement(edit);
-			statement.setString(1, nueva_localidad);
+			statement.setString(1, nueva_localidad.toUpperCase());
 			statement.setInt(2, localidad_a_editar.getIdLocalidad());
 			if (statement.executeUpdate() > 0) // Si se ejecutï¿½ devuelvo true
 				return true;

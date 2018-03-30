@@ -3,10 +3,13 @@ package presentacion.controlador;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Date;
 
 import javax.swing.JComboBox;
 
+import dto.DomicilioDTO;
+import dto.EtiquetaDTO;
+import dto.LocalidadDTO;
+import dto.PersonaDTO;
 import modelo.Agenda;
 import modelo.Fechas;
 import presentacion.reportes.ReporteAgenda;
@@ -19,12 +22,9 @@ import presentacion.vista.VentanaPersona;
 import presentacion.vista.Vista;
 import presentacion.vista.VistaEtiqueta;
 import presentacion.vista.VistaLocalidad;
-import dto.DomicilioDTO;
-import dto.EtiquetaDTO;
-import dto.LocalidadDTO;
-import dto.PersonaDTO;
 
-public class Controlador implements ActionListener{
+public class Controlador implements ActionListener {
+
 	private Agenda agenda;
 
 	/* PERSONA */
@@ -73,8 +73,11 @@ public class Controlador implements ActionListener{
 
 		this.personas_en_tabla = agenda.obtenerPersonas();
 		for (int i = 0; i < this.personas_en_tabla.size(); i++) {
-			Object[] fila = { this.personas_en_tabla.get(i).getNombre(), this.personas_en_tabla.get(i).getTelefono(),
-					this.personas_en_tabla.get(i).getEmail(), this.personas_en_tabla.get(i).getFeNacimiento(),
+			Object[] fila = { this.personas_en_tabla.get(i).getNombre(), 
+					this.personas_en_tabla.get(i).getApellido(), 
+					this.personas_en_tabla.get(i).getTelefono(),
+					this.personas_en_tabla.get(i).getEmail(), 
+					this.personas_en_tabla.get(i).getFeNacimiento(),
 					this.agenda.obtenerDomicilio(this.personas_en_tabla.get(i).getIdDomicilio()),
 					this.agenda.obtenerEtiqueta(this.personas_en_tabla.get(i).getIdEtiqueta()) };
 			this.vista.getModelPersonas().addRow(fila);
@@ -141,6 +144,7 @@ public class Controlador implements ActionListener{
 	private String obtenerElementoSelecciona(JComboBox comboBox) {
 		return comboBox.getSelectedItem().toString();
 	}
+	
 
 	public void actionPerformed(ActionEvent e) {
 
@@ -148,7 +152,35 @@ public class Controlador implements ActionListener{
 		/* Ventana de Alta de persona */
 		if (e.getSource() == this.vista.getBtnAgregar()) {
 			this.ventanaPersona = new VentanaPersona(this);
+			this.ventanaPersona.getBtnEtiqueta().addActionListener(this);
 			this.llenarComboBoxNuevaPersona();
+		}
+		/* Agrega una nueva persona */
+		else if (this.ventanaPersona != null && e.getSource() == this.ventanaPersona.getBtnAgregarPersona()) {			
+			/** Crea el domicilio **/
+			DomicilioDTO nuevoDomicilio = new DomicilioDTO(0, 
+					this.ventanaPersona.getTxtCalle().getText(),
+					this.ventanaPersona.getTxtAltura().getText(), 
+					this.ventanaPersona.getTxtPiso().getText(),
+					this.ventanaPersona.getTxtDepartamento().getText(), 
+					this.agenda.obtenerIdLocalidad(this.obtenerElementoSelecciona(this.ventanaPersona.getCmbLocalidad())));
+					this.agenda.agregarDocimilio(nuevoDomicilio); /** Guarda el domicilio en la DB **/
+			/** Crea la persona **/
+			PersonaDTO nuevaPersona = new PersonaDTO(0, this.ventanaPersona.getTxtNombre().getText(),
+					this.ventanaPersona.getTxtApellido().getText(),
+					this.ventanaPersona.getTxtTelefono().getText(), 
+					this.ventanaPersona.getTxtEmail().getText(),
+					this.ventanaPersona.getTxtFechaNacimiento(), 
+					this.agenda.obtenerIdDomicilio(nuevoDomicilio), /* Busca el id del domicilio guardado anteriormente */
+					this.agenda.obtenerIdEtiqueta(this.obtenerElementoSelecciona(this.ventanaPersona.getCmbEtiquetas())));
+			
+			if(Validador.validaVentanaPersona(ventanaPersona)) {
+				return;
+			}else {
+				this.agenda.agregarPersona(nuevaPersona);/** Guarda la persona en la DB **/
+				this.llenarTablaPersonas();
+				this.ventanaPersona.dispose();	
+			}
 		}
 		/* Borra una persona seleccionada */
 		else if (e.getSource() == this.vista.getBtnBorrar()) {
@@ -159,36 +191,18 @@ public class Controlador implements ActionListener{
 			}
 			this.llenarTablaPersonas(); // Actualiza la tabla de personas
 		}
-		/* Agrega una nueva persona */
-		else if (this.ventanaPersona != null && e.getSource() == this.ventanaPersona.getBtnAgregarPersona()) {
-			/** Crea el domicilio **/
-			DomicilioDTO nuevoDomicilio = new DomicilioDTO(0, this.ventanaPersona.getTxtCalle().getText(),
-					this.ventanaPersona.getTxtAltura().getText(), this.ventanaPersona.getTxtPiso().getText(),
-					this.ventanaPersona.getTxtDepartamento().getText(), 
-					this.agenda.obtenerIdLocalidad(this.obtenerElementoSelecciona(this.ventanaPersona.getCmbLocalidad())));
-					this.agenda.agregarDocimilio(nuevoDomicilio); /** Guarda el domicilio en la DB **/
-			/** Crea la persona **/
-			PersonaDTO nuevaPersona = new PersonaDTO(0, this.ventanaPersona.getTxtNombre().getText(),
-					this.ventanaPersona.getTxtTelefono().getText(), this.ventanaPersona.getTxtEmail().getText(),
-					this.ventanaPersona.getTxtFechaNacimiento(), 
-					this.agenda.obtenerIdDomicilio(nuevoDomicilio), /* Busca el id del domicilio guardado anteriormente */
-					this.agenda.obtenerIdEtiqueta(this.obtenerElementoSelecciona(this.ventanaPersona.getCmbEtiquetas())));
-			this.agenda.agregarPersona(nuevaPersona);/** Guarda la persona en la DB **/
-			this.llenarTablaPersonas();
-			this.ventanaPersona.dispose();
-		}
 		/* Abrir la ventana de edici�n de personas */
 		else if (e.getSource() == this.vista.getBtnEditar()) {
 			this.ventanaEditaPersona = new VentanaEditaPersona(this);
-
 			int[] filas_seleccionadas = this.vista.getTablaPersonas().getSelectedRows();
 			String etiqueta = "";
 			String localidad = "";
 			for (int fila : filas_seleccionadas) {
 				this.ventanaEditaPersona.setTxtNombre(this.personas_en_tabla.get(fila).getNombre());
+				this.ventanaEditaPersona.setTxtApellido(this.personas_en_tabla.get(fila).getApellido());
 				this.ventanaEditaPersona.setTxtTelefono(this.personas_en_tabla.get(fila).getTelefono());
 				this.ventanaEditaPersona.setTxtEmail(this.personas_en_tabla.get(fila).getEmail());
-				this.ventanaEditaPersona.setTxtFechaNacimiento(Fechas.deDateToString(this.personas_en_tabla.get(fila).getFeNacimiento()));
+				this.ventanaEditaPersona.setTxtFechaNacimiento((this.personas_en_tabla.get(fila).getFeNacimiento()));
 				/* Completa los campos de domicilio */
 				this.ventanaEditaPersona.setTxtCalle(
 						this.agenda.obtenerDomicilioDTO(this.personas_en_tabla.get(fila).getIdDomicilio()).getCalle());
@@ -197,21 +211,33 @@ public class Controlador implements ActionListener{
 				this.ventanaEditaPersona.setTxtPiso(
 						this.agenda.obtenerDomicilioDTO(this.personas_en_tabla.get(fila).getIdDomicilio()).getPiso());
 				this.ventanaEditaPersona.setTxtDepartamento(this.agenda
-						.obtenerDomicilioDTO(this.personas_en_tabla.get(fila).getIdDomicilio()).getDepto());
+						.obtenerDomicilioDTO(this.personas_en_tabla.get(fila).getIdDomicilio()).getDepartamento());
 				etiqueta = this.agenda.obtenerEtiqueta(this.personas_en_tabla.get(fila).getIdEtiqueta());
 				localidad = this.agenda.obtenerLocalidad(this.agenda
 						.obtenerDomicilioDTO(this.personas_en_tabla.get(fila).getIdDomicilio()).getIdLocalidad());
 			}
 			this.llenarComboBoxEditarPersona(etiqueta, localidad);
 			this.ventanaEditaPersona.setVisible(true);
+			this.ventanaEditaPersona.getBtnEtiqueta().addActionListener(this);
 		}
-
+		/* Abrir la ventana para crear etiquetas dentro del abrir personas*/
+		else if (this.ventanaPersona != null && e.getSource() == this.ventanaPersona.getBtnEtiqueta()) {
+				this.vistaEtiqueta = new VistaEtiqueta(this);
+				this.llenarTablaEtiquetas();
+				this.vistaEtiqueta.setVisible(true);
+		}
+		
 		/* Edita la persona */
 		else if (this.ventanaEditaPersona != null
 				&& e.getSource() == this.ventanaEditaPersona.getBtnModificarPersona()) {
+			
 			int[] filas_seleccionadas = this.vista.getTablaPersonas().getSelectedRows();
 			for (int fila : filas_seleccionadas) {
 				/* Edito primero el domicilio */
+				
+				if(Validador.validaVentanaEditarPersona(this.ventanaEditaPersona)) {
+					return;
+				}else{
 				this.agenda.editarDomicilio(this.ventanaEditaPersona.getTxtCalle().getText(),
 						this.ventanaEditaPersona.getTxtAltura().getText(),
 						this.ventanaEditaPersona.getTxtPiso().getText(),
@@ -222,18 +248,27 @@ public class Controlador implements ActionListener{
 
 				/* Edita a la persona */
 				this.agenda.editarPersona(this.ventanaEditaPersona.getTxtNombre().getText(),
+						this.ventanaEditaPersona.getTxtApellido().getText(),
 						this.ventanaEditaPersona.getTxtTelefono().getText(),
 						this.ventanaEditaPersona.getTxtEmail().getText(),
-						this.ventanaEditaPersona.getTxtFechaNacimiento().getText(),
+						Fechas.deDateToString(this.ventanaEditaPersona.getTxtFechaNacimiento()),
 						this.personas_en_tabla.get(fila).getIdDomicilio(),
 						this.agenda.obtenerIdEtiqueta(
 								this.obtenerElementoSelecciona(this.ventanaEditaPersona.getCmbEtiquetas())),
 						this.personas_en_tabla.get(fila).getIdPersona());
+				}
 			}
 			this.llenarTablaPersonas();
 			this.ventanaEditaPersona.setVisible(false);
 		}
-
+		
+		/* Abrir la ventana para crear etiquetas dentro del editar de  personas*/
+		else if (this.ventanaEditaPersona != null && e.getSource() == this.ventanaEditaPersona.getBtnEtiqueta()) {
+				this.vistaEtiqueta = new VistaEtiqueta(this);
+				this.llenarTablaEtiquetas();
+				this.vistaEtiqueta.setVisible(true);
+		}
+		
 		/** Vista Etiqueta **/
 		/* Abrir la ventana de Etiquetar (lista de etiquetas y botones ABM */
 		else if (e.getSource() == this.vista.getBtnEtiqueta()) {
@@ -245,7 +280,6 @@ public class Controlador implements ActionListener{
 		else if (this.vistaEtiqueta != null && e.getSource() == this.vistaEtiqueta.getBtnAgregarEtiqueta()) {
 			this.ventanaEtiqueta = new VentanaEtiqueta(this);
 		}
-
 		/* Abre la ventana de edici�n de etiquetas */
 		else if (this.vistaEtiqueta != null && e.getSource() == this.vistaEtiqueta.getBtnEditarEtiqueta()) {
 			this.ventanaEditaEtiqueta = new VentanaEditaEtiqueta(this);
@@ -300,7 +334,6 @@ public class Controlador implements ActionListener{
 			int[] filas_seleccionadas = this.vistaLocalidad.getTablaLocalidad().getSelectedRows();
 			for (int fila : filas_seleccionadas) {
 				this.ventanaEditaLocalidad.setTxtLocalidad(this.localidades_en_tabla.get(fila).getLocalidad());
-				;
 			}
 			this.ventanaEditaLocalidad.setVisible(true);
 		}
@@ -333,11 +366,11 @@ public class Controlador implements ActionListener{
 
 		/** Reporte **/
 		else if (e.getSource() == this.vista.getBtnReporte()) {
-			ReporteAgenda reporte = new ReporteAgenda(agenda.obtenerPersonas());
+			ReporteAgenda reporte  = new ReporteAgenda(this.agenda.getPersonaReporte());
 			reporte.mostrar();
 		}
 	}
-
+ 
 	public Agenda getAgenda() {
 		return this.agenda;
 	}

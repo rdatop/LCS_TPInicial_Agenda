@@ -1,22 +1,21 @@
 package persistencia.dao.mysql;
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import persistencia.conexion.Conexion;
-import persistencia.dao.interfaz.PersonaDAO;
 import dto.PersonaDTO;
 import modelo.Fechas;
+import persistencia.conexion.Conexion;
+import persistencia.dao.interfaz.PersonaDAO;
 
-public class PersonaDAOSQL implements PersonaDAO{
-	private static final String insert = "INSERT INTO persona(idPersona, nombre, telefono, email, fechaNaciomiento, idDomicilio, idEtiqueta) VALUES(?, ?, ?, ?, ?, ?, ?)";
+public class PersonaDAOSQL implements PersonaDAO {
+	private static final String insert = "INSERT INTO persona(idPersona, nombre, apellido, telefono, email, fechaNacimiento, idDomicilio, idEtiqueta) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String delete = "DELETE FROM persona WHERE idPersona = ?";
-	private static final String readall = "SELECT * FROM persona";
-	private static final String edit = "UPDATE persona SET persona.nombre = ?, persona.telefono = ?, persona.email = ?, persona.fechaNaciomiento = ?, persona.idDomicilio = ?, persona.idEtiqueta = ? WHERE idPersona = ?";
+	private static final String readall = "SELECT * FROM persona ORDER BY persona.apellido";
+	private static final String edit = "UPDATE persona SET persona.nombre = ?, persona.apellido = ?, persona.telefono = ?, persona.email = ?, persona.fechaNacimiento = ?, persona.idDomicilio = ?, persona.idEtiqueta = ? WHERE idPersona = ?";
 	
 	public boolean insert(PersonaDTO persona) {
 		PreparedStatement statement;
@@ -25,12 +24,13 @@ public class PersonaDAOSQL implements PersonaDAO{
 			statement = conexion.getSQLConexion().prepareStatement(insert);
 			statement.setInt(1, persona.getIdPersona());
 			statement.setString(2, persona.getNombre());
-			statement.setString(3, persona.getTelefono());
-			statement.setString(4, persona.getEmail());
-			statement.setDate(5, Fechas.getFechasSQL(persona.getFeNacimiento()));
-			statement.setInt(6, persona.getIdDomicilio());
-			statement.setInt(7, persona.getIdEtiqueta());
-			if (statement.executeUpdate() > 0) // Si se ejecutï¿½ devuelvo true
+			statement.setString(3, persona.getApellido());
+			statement.setString(4, persona.getTelefono());
+			statement.setString(5, persona.getEmail());
+			statement.setDate(6, Fechas.getFechasSQL(persona.getFeNacimiento()));
+			statement.setInt(7, persona.getIdDomicilio());
+			statement.setInt(8, persona.getIdEtiqueta());
+			if (statement.executeUpdate() > 0) // Si se ejecutó devuelvo true
 				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -66,9 +66,10 @@ public class PersonaDAOSQL implements PersonaDAO{
 			while (resultSet.next()) {
 				personas.add(new PersonaDTO(resultSet.getInt("idPersona"), 
 						resultSet.getString("Nombre"),
+						resultSet.getString("Apellido"),
 						resultSet.getString("Telefono"),
 						resultSet.getString("email"),
-						resultSet.getDate("fechaNaciomiento"),
+						resultSet.getDate("fechaNacimiento"),
 						resultSet.getInt("idDomicilio"),
 						resultSet.getInt("idEtiqueta")));
 			}
@@ -78,23 +79,25 @@ public class PersonaDAOSQL implements PersonaDAO{
 		return personas;
 	}
 	
-	public boolean edit (String nuevoNombre, String nuevoTelefono, String nuevoEmail, String nuevaFechaNacimiento, int nuevoIdDomicilio, int nuevoIdEtiqueta, int idPersona_a_editar) {
+	public boolean edit (String nuevoNombre, String nuevoApellido, String nuevoTelefono, String nuevoEmail, String nuevaFechaNacimiento, int nuevoIdDomicilio, int nuevoIdEtiqueta, int idPersona_a_editar) {
 		PreparedStatement statement;
 		Conexion conexion = Conexion.getConexion();
 		try {
 			statement = conexion.getSQLConexion().prepareStatement(edit);
 			statement.setString(1, nuevoNombre);
-			statement.setString(2, nuevoTelefono);
-			statement.setString(3, nuevoEmail);
-			statement.setString(4, nuevaFechaNacimiento);
-			statement.setInt(5,nuevoIdDomicilio);
-			statement.setInt(6,nuevoIdEtiqueta);
-			statement.setInt(7, idPersona_a_editar);
-			if (statement.executeUpdate() > 0) // Si se ejecutï¿½ devuelvo true
+			statement.setString(2, nuevoApellido);
+			statement.setString(3, nuevoTelefono);
+			statement.setString(4, nuevoEmail);
+			statement.setString(5, nuevaFechaNacimiento);
+			statement.setInt(6,nuevoIdDomicilio);
+			statement.setInt(7,nuevoIdEtiqueta);
+			statement.setInt(8, idPersona_a_editar);
+			if (statement.executeUpdate() > 0) // Si se ejecutó devuelvo true
 				return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
+	
 }

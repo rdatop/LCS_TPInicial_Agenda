@@ -4,8 +4,9 @@ import java.util.List;
 
 import dto.LocalidadDTO;
 
-public interface LocalidadDAO {
-
+public interface LocalidadDAO 
+{
+	
 	public boolean insert(LocalidadDTO localdiad);
 
 	public boolean delete(int idlocalidad_a_eliminar);
